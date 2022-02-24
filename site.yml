@@ -1,0 +1,9 @@
+- hosts: proxy
+  become: yes
+  roles:
+    - nginx
+
+- hosts: docker
+  become: yes
+  roles:
+    - app

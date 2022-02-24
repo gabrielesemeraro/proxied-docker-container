@@ -1,0 +1,64 @@
+- name: Install docker packages
+  become: yes
+  apt:
+    name: ['apt-transport-https','ca-certificates', 'curl', 'software-properties-common']
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+
+- name: Add Docker s GPG key for ubuntu from official site
+  become: yes
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  tags:
+    - docker
+
+- name: Verify gpg key with the fingerprint
+  become: yes
+  apt_key:
+    id: 0EBFCD88
+    state: present
+  tags:
+    - docker
+
+- name: Configure Docker for ubuntu stable repository
+  become: yes
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+
+- name: Install docker-ce
+  become: yes
+  apt:
+    name: docker-ce
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+
+- name: Add "ansible_ubuntu_demo" user to "docker" group
+  become: yes
+  user:
+    name: "ansible_ubuntu_demo"
+    group: "docker"
+    append: yes
+  tags:
+    - docker
+
+- name: Install docker-compose from official github repo
+  become: yes
+  get_url:
+    url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 'u+x,g+x'
+
+- name: Run docker-compose
+  become: yes
+  command: docker-compose up -d
+  args:
+    chdir: /home/vagrant/syncd/
